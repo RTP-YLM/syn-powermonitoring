@@ -1,0 +1,615 @@
+@page
+@model AspnetCoreFull.Pages.Apps.PowerMonitoring.PowerMonitoringModel
+@{
+  ViewData["Title"] = "Power Monitoring";
+}
+
+@section VendorStyles {
+  <link rel="stylesheet" href="~/vendor/libs/apex-charts/apex-charts.dist.css" />
+  <link rel="stylesheet" href="~/vendor/libs/datatables-bs5/datatables.bootstrap5.dist.css" />
+  <link rel="stylesheet" href="~/vendor/libs/leaflet/leaflet.dist.css" />
+}
+
+@section VendorScripts {
+  <script src="~/vendor/libs/apex-charts/apexcharts.dist.js"></script>
+  <script src="~/vendor/libs/datatables-bs5/datatables-bootstrap5.dist.js"></script>
+  <script src="~/vendor/libs/leaflet/leaflet.dist.js"></script>
+}
+
+<!-- ส่วน Status Cards และ Power Overview ที่มีอยู่เดิม -->
+<!-- Status Cards -->
+<div class="row">
+  <div class="col-sm-6 col-lg-3 mb-4">
+    <div class="card card-border-shadow-primary h-100">
+      <div class="card-body">
+        <div class="d-flex align-items-center mb-2 pb-1">
+          <div class="avatar me-2">
+            <span class="avatar-initial rounded bg-label-primary"><i class="bx bx-power-off"></i></span>
+          </div>
+          <h4 class="ms-1 mb-0">42</h4>
+        </div>
+        <p class="mb-1">Online UPS Units</p>
+        <p class="mb-0">
+          <span class="fw-medium me-1">+8.2%</span>
+          <small class="text-muted">than last hour</small>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-sm-6 col-lg-3 mb-4">
+    <div class="card card-border-shadow-warning h-100">
+      <div class="card-body">
+        <div class="d-flex align-items-center mb-2 pb-1">
+          <div class="avatar me-2">
+            <span class="avatar-initial rounded bg-label-warning"><i class="bx bx-error"></i></span>
+          </div>
+          <h4 class="ms-1 mb-0">8</h4>
+        </div>
+        <p class="mb-1">Units with Warnings</p>
+        <p class="mb-0">
+          <span class="fw-medium me-1">-3.7%</span>
+          <small class="text-muted">than last hour</small>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-sm-6 col-lg-3 mb-4">
+    <div class="card card-border-shadow-danger h-100">
+      <div class="card-body">
+        <div class="d-flex align-items-center mb-2 pb-1">
+          <div class="avatar me-2">
+            <span class="avatar-initial rounded bg-label-danger"><i class="bx bxs-battery-low"></i></span>
+          </div>
+          <h4 class="ms-1 mb-0">5</h4>
+        </div>
+        <p class="mb-1">Critical Battery Level</p>
+        <p class="mb-0">
+          <span class="fw-medium me-1">+2.3%</span>
+          <small class="text-muted">than last hour</small>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-sm-6 col-lg-3 mb-4">
+    <div class="card card-border-shadow-info h-100">
+      <div class="card-body">
+        <div class="d-flex align-items-center mb-2 pb-1">
+          <div class="avatar me-2">
+            <span class="avatar-initial rounded bg-label-info"><i class="bx bx-plug"></i></span>
+          </div>
+          <h4 class="ms-1 mb-0">13</h4>
+        </div>
+        <p class="mb-1">On Battery Power</p>
+        <p class="mb-0">
+          <span class="fw-medium me-1">-1.5%</span>
+          <small class="text-muted">than last hour</small>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Power Overview -->
+<div class="row">
+  <div class="col-xxl-6 mb-4">
+    <div class="card h-100">
+      <div class="card-header">
+        <div class="card-title mb-0">
+          <h5 class="m-0">Power System Overview</h5>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="d-none d-lg-flex vehicles-progress-labels mb-3">
+          <div class="power-progress-label online-text" style="width: 45.7%;">On Utility</div>
+          <div class="power-progress-label battery-text" style="width: 28.3%;">On Battery</div>
+          <div class="power-progress-label bypass-text" style="width: 17.4%;">On Bypass</div>
+          <div class="power-progress-label offline-text" style="width: 8.6%;">Offline</div>
+        </div>
+        <!-- Progress Bars for Power States -->
+        <div class="power-overview-progress progress mb-3" style="height: 46px;">
+          <div class="progress-bar bg-success" style="width: 45.7%">45.7%</div>
+          <div class="progress-bar bg-warning" style="width: 28.3%">28.3%</div>
+          <div class="progress-bar bg-info" style="width: 17.4%">17.4%</div>
+          <div class="progress-bar bg-danger" style="width: 8.6%">8.6%</div>
+        </div>
+        <!-- Details Table -->
+        <div class="table-responsive">
+          <table class="table">
+            <tbody>
+              <tr>
+                <td>On Utility Power</td>
+                <td>45.7%</td>
+                <td>32 units</td>
+              </tr>
+              <tr>
+                <td>On Battery Power</td>
+                <td>28.3%</td>
+                <td>20 units</td>
+              </tr>
+              <tr>
+                <td>On Bypass</td>
+                <td>17.4%</td>
+                <td>12 units</td>
+              </tr>
+              <tr>
+                <td>Offline</td>
+                <td>8.6%</td>
+                <td>6 units</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Additional Performance Metrics -->
+  <div class="col-xxl-6 mb-4">
+    <div class="row">
+      <!-- Battery Performance -->
+      <div class="col-md-6 mb-4">
+        <div class="card h-100">
+          <div class="card-header d-flex align-items-center justify-content-between">
+            <div class="card-title mb-0">
+              <h5 class="m-0 me-2">Battery Performance</h5>
+              <small class="text-muted">Monthly analysis</small>
+            </div>
+            <div class="dropdown">
+              <button class="btn btn-label-primary dropdown-toggle" data-bs-toggle="dropdown">January</button>
+              <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="javascript:void(0);">January</a></li>
+                <li><a class="dropdown-item" href="javascript:void(0);">February</a></li>
+                <li><a class="dropdown-item" href="javascript:void(0);">March</a></li>
+              </ul>
+            </div>
+          </div>
+          <div class="card-body">
+            <div id="batteryPerformanceChart"></div>
+          </div>
+        </div>
+      </div>
+
+
+      <!-- Alert History -->
+      <div class="col-md-6 mb-4">
+        <div class="card h-100">
+          <div class="card-header">
+            <h5 class="card-title mb-0">Alert History</h5>
+          </div>
+          <div class="card-body">
+            <ul class="timeline mb-0">
+              <li class="timeline-item timeline-item-transparent">
+                <span class="timeline-point timeline-point-danger"></span>
+                <div class="timeline-event">
+                  <div class="timeline-header">
+                    <h6 class="mb-0">UPS Critical Battery</h6>
+                    <small class="text-muted">2 hours ago</small>
+                  </div>
+                  <p class="mb-2">DC East - UPS #5 battery level critical</p>
+                  <div class="d-flex flex-wrap">
+                    <button class="btn btn-sm btn-outline-danger me-2">View Details</button>
+                  </div>
+                </div>
+              </li>
+              <li class="timeline-item timeline-item-transparent">
+                <span class="timeline-point timeline-point-warning"></span>
+                <div class="timeline-event">
+                  <div class="timeline-header">
+                    <h6 class="mb-0">Temperature Warning</h6>
+                    <small class="text-muted">5 hours ago</small>
+                  </div>
+                  <p class="mb-2">HQ - UPS #2 high temperature warning</p>
+                  <div class="d-flex flex-wrap">
+                    <button class="btn btn-sm btn-outline-warning me-2">View Details</button>
+                  </div>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- เพิ่ม Map Section -->
+<div class="row">
+  <!-- Power Distribution Map -->
+  <div class="col-xxl-8 mb-4">
+    <div class="card">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <div class="card-title mb-0">
+          <h5 class="m-0">Power Distribution Map</h5>
+          <small class="text-muted">Real-time UPS locations and status</small>
+        </div>
+        <div class="btn-group">
+          <button type="button" class="btn btn-primary btn-sm active">All UPS</button>
+          <button type="button" class="btn btn-outline-primary btn-sm">Warnings</button>
+          <button type="button" class="btn btn-outline-primary btn-sm">Critical</button>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="leaflet-map" id="powerMap" style="height: 500px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Location Details -->
+  <div class="col-xxl-4 mb-4">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title mb-0">
+          <h5 class="m-0">Location Details</h5>
+          <small class="text-muted">UPS status by location</small>
+        </div>
+      </div>
+      <div class="card-body">
+        <ul class="p-0 m-0">
+          <li class="d-flex mb-4 pb-1">
+            <div class="avatar flex-shrink-0 me-3">
+              <span class="avatar-initial rounded bg-label-success"><i class="bx bx-check"></i></span>
+            </div>
+            <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
+              <div class="me-2">
+                <h6 class="mb-0">Bangkok HQ</h6>
+                <small class="text-muted">12 UPS Units</small>
+              </div>
+              <div class="user-progress">
+                <small class="fw-semibold">100% Online</small>
+              </div>
+            </div>
+          </li>
+          <li class="d-flex mb-4 pb-1">
+            <div class="avatar flex-shrink-0 me-3">
+              <span class="avatar-initial rounded bg-label-warning"><i class="bx bx-error"></i></span>
+            </div>
+            <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
+              <div class="me-2">
+                <h6 class="mb-0">Datacenter East</h6>
+                <small class="text-muted">8 UPS Units</small>
+              </div>
+              <div class="user-progress">
+                <small class="fw-semibold">2 Warnings</small>
+              </div>
+            </div>
+          </li>
+          <li class="d-flex mb-4 pb-1">
+            <div class="avatar flex-shrink-0 me-3">
+              <span class="avatar-initial rounded bg-label-danger"><i class="bx bxs-battery-low bx-flashing"></i></span>
+            </div>
+            <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
+              <div class="me-2">
+                <h6 class="mb-0">Branch Office North</h6>
+                <small class="text-muted">5 UPS Units</small>
+              </div>
+              <div class="user-progress">
+                <small class="fw-semibold">1 Critical</small>
+              </div>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+@section PageScripts {
+  <script>
+    // Initialize map
+    const map = L.map('powerMap').setView([13.7563, 100.5018], 12);  // Bangkok coordinates
+
+    // Add OpenStreetMap tiles
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    // Define markers with different colors based on status
+    const normalIcon = L.divIcon({
+      className: 'custom-div-icon',
+      html: "<div style='background-color:#4CAF50;' class='marker-pin'></div><i class='bx bx-power-off'></i>",
+      iconSize: [30, 42],
+      iconAnchor: [15, 42]
+    });
+
+    const warningIcon = L.divIcon({
+      className: 'custom-div-icon',
+      html: "<div style='background-color:#FFC107;' class='marker-pin'></div><i class='bx bx-error'></i>",
+      iconSize: [30, 42],
+      iconAnchor: [15, 42]
+    });
+
+    const criticalIcon = L.divIcon({
+      className: 'custom-div-icon',
+      html: "<div style='background-color:#DC3545;' class='marker-pin'></div><i class='bx bxs-battery-low bx-flashing'></i>",
+      iconSize: [30, 42],
+      iconAnchor: [15, 42]
+    });
+
+    // Sample UPS data
+    const upsLocations = [
+      {
+        lat: 13.7563,
+        lng: 100.5018,
+        status: 'normal',
+        name: 'UPS-001',
+        details: {
+          batteryLevel: '95%',
+          loadLevel: '45%',
+          temperature: '25°C'
+        }
+      },
+      {
+        lat: 13.7469,
+        lng: 100.5349,
+        status: 'warning',
+        name: 'UPS-002',
+        details: {
+          batteryLevel: '65%',
+          loadLevel: '82%',
+          temperature: '32°C'
+        }
+      },
+      {
+        lat: 13.8044,
+        lng: 100.5552,
+        status: 'critical',
+        name: 'UPS-003',
+        details: {
+          batteryLevel: '15%',
+          loadLevel: '95%',
+          temperature: '38°C'
+        }
+      },
+      {
+        lat: 13.7278,
+        lng: 100.5241,
+        status: 'normal',
+        name: 'UPS-004',
+        details: {
+          batteryLevel: '88%',
+          loadLevel: '55%',
+          temperature: '27°C'
+        }
+      },
+      {
+        lat: 13.8088,
+        lng: 100.5650,
+        status: 'warning',
+        name: 'UPS-005',
+        details: {
+          batteryLevel: '45%',
+          loadLevel: '78%',
+          temperature: '34°C'
+        }
+      },
+      {
+        lat: 13.7216,
+        lng: 100.5135,
+        status: 'critical',
+        name: 'UPS-006',
+        details: {
+          batteryLevel: '10%',
+          loadLevel: '40%',
+          temperature: '26°C'
+        }
+      },
+      {
+        lat: 13.8157,
+        lng: 100.5321,
+        status: 'warning',
+        name: 'UPS-007',
+        details: {
+          batteryLevel: '55%',
+          loadLevel: '85%',
+          temperature: '33°C'
+        }
+      },
+      {
+        lat: 13.7373,
+        lng: 100.5613,
+        status: 'critical',
+        name: 'UPS-008',
+        details: {
+          batteryLevel: '10%',
+          loadLevel: '92%',
+          temperature: '39°C'
+        }
+      },
+      {
+        lat: 13.7819,
+        lng: 100.5447,
+        status: 'normal',
+        name: 'UPS-009',
+        details: {
+          batteryLevel: '90%',
+          loadLevel: '48%',
+          temperature: '28°C'
+        }
+      },
+      {
+        lat: 13.7444,
+        lng: 100.5892,
+        status: 'warning',
+        name: 'UPS-010',
+        details: {
+          batteryLevel: '58%',
+          loadLevel: '75%',
+          temperature: '31°C'
+        }
+      },
+      {
+        lat: 13.8265,
+        lng: 100.5283,
+        status: 'critical',
+        name: 'UPS-011',
+        details: {
+          batteryLevel: '18%',
+          loadLevel: '88%',
+          temperature: '37°C'
+        }
+      },
+      {
+        lat: 13.7162,
+        lng: 100.5371,
+        status: 'normal',
+        name: 'UPS-012',
+        details: {
+          batteryLevel: '87%',
+          loadLevel: '52%',
+          temperature: '26°C'
+        }
+      },
+      {
+        lat: 13.7921,
+        lng: 100.5516,
+        status: 'warning',
+        name: 'UPS-013',
+        details: {
+          batteryLevel: '48%',
+          loadLevel: '80%',
+          temperature: '35°C'
+        }
+      },
+      {
+        lat: 13.7611,
+        lng: 100.5078,
+        status: 'normal',
+        name: 'UPS-014',
+        details: {
+          batteryLevel: '93%',
+          loadLevel: '45%',
+          temperature: '27°C'
+        }
+      },
+      {
+        lat: 13.7288,
+        lng: 100.5680,
+        status: 'warning',
+        name: 'UPS-015',
+        details: {
+          batteryLevel: '52%',
+          loadLevel: '83%',
+          temperature: '32°C'
+        }
+      },
+      {
+        lat: 13.8133,
+        lng: 100.5489,
+        status: 'critical',
+        name: 'UPS-016',
+        details: {
+          batteryLevel: '12%',
+          loadLevel: '94%',
+          temperature: '38°C'
+        }
+      }
+    ];
+
+    // Add markers to map
+    upsLocations.forEach(ups => {
+      const icon = ups.status === 'normal' ? normalIcon :
+        ups.status === 'warning' ? warningIcon :
+          criticalIcon;
+
+      L.marker([ups.lat, ups.lng], { icon: icon })
+        .bindPopup(`
+                                  <div class="p-2">
+                                    <h6>${ups.name}</h6>
+                                    <div class="mb-2">
+                                      <small>Battery Level: ${ups.details.batteryLevel}</small><br>
+                                      <small>Load: ${ups.details.loadLevel}</small><br>
+                                      <small>Temperature: ${ups.details.temperature}</small>
+                                    </div>
+                                    <button class="btn btn-primary btn-sm">View Details</button>
+                                  </div>
+                                `)
+        .addTo(map);
+    });
+
+    // Add custom CSS
+    const style = document.createElement('style');
+    style.textContent = `
+                                                                  .marker-pin {
+                                                                    width: 30px;
+                                                                    height: 30px;
+                                                                    border-radius: 50% 50% 50% 0;
+                                                                    position: absolute;
+                                                                    transform: rotate(-45deg);
+                                                                    left: 50%;
+                                                                    top: 50%;
+                                                                    margin: -15px 0 0 -15px;
+                                                                  }
+
+                                                                  .custom-div-icon i {
+                                                                    position: absolute;
+                                                                    width: 22px;
+                                                                    font-size: 22px;
+                                                                    left: 0;
+                                                                    right: 0;
+                                                                    margin: 10px auto;
+                                                                    text-align: center;
+                                                                    color: white;
+                                                                  }
+                                                                `;
+    document.head.appendChild(style);
+
+    // ตัวอย่างข้อมูลสำหรับกราฟ
+    const batteryData = {
+      months: ['January', 'February', 'March', 'April', 'May', 'June'],
+      capacity: [95, 90, 92, 88, 85, 80], // Capacity (%)
+      usage: [50, 60, 55, 70, 65, 75], // Usage (kWh)
+      status: ['Normal', 'Normal', 'Warning', 'Critical', 'Critical', 'Critical'] // Status
+    };
+
+    // สร้างกราฟ
+    const options = {
+      chart: {
+        height: 350,
+        type: 'bar',
+        toolbar: { show: false }
+      },
+      series: [
+        {
+          name: 'Capacity (%)',
+          data: batteryData.capacity
+        },
+        {
+          name: 'Usage (kWh)',
+          data: batteryData.usage
+        }
+      ],
+      xaxis: {
+        categories: batteryData.months,
+        title: { text: 'Months' }
+      },
+      yaxis: [
+        {
+          title: { text: 'Capacity (%)' },
+          opposite: false
+        },
+        {
+          title: { text: 'Usage (kWh)' }
+        }
+      ],
+      colors: ['#28a745', '#ffc107'], // สีสำหรับ Capacity และ Usage
+      legend: {
+        position: 'top'
+      },
+      tooltip: {
+        shared: true,
+        intersect: false
+      }
+    };
+
+    // แสดงกราฟใน #batteryPerformanceChart
+    const chart = new ApexCharts(document.querySelector("#batteryPerformanceChart"), options);
+    chart.render();
+
+  </script>
+}

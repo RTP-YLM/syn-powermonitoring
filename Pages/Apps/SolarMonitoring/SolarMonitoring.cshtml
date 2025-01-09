@@ -1,0 +1,516 @@
+@page
+@model AspnetCoreFull.Pages.Apps.SolarMonitoring.SolarMonitoringModel
+@{
+  ViewData["Title"] = "Solar Energy Monitoring";
+}
+
+@section VendorStyles {
+  <link rel="stylesheet" href="~/vendor/libs/apex-charts/apex-charts.dist.css" />
+  <link rel="stylesheet" href="~/vendor/libs/datatables-bs5/datatables.bootstrap5.dist.css" />
+  <link rel="stylesheet" href="~/vendor/libs/leaflet/leaflet.dist.css" />
+}
+
+@section VendorScripts {
+  <script src="~/vendor/libs/apex-charts/apexcharts.dist.js"></script>
+  <script src="~/vendor/libs/datatables-bs5/datatables-bootstrap5.dist.js"></script>
+  <script src="~/vendor/libs/leaflet/leaflet.dist.js"></script>
+}
+
+<h4 class="py-3 breadcrumb-wrapper mb-4">
+  <span class="text-muted fw-light">Monitoring /</span> Solar Energy Dashboard
+</h4>
+
+<!-- Status Cards -->
+<div class="row">
+  <div class="col-lg-3 col-sm-6 mb-4">
+    <div class="card card-border-shadow-success h-100">
+      <div class="card-body">
+        <div class="d-flex align-items-center mb-2 pb-1">
+          <div class="avatar me-2">
+            <span class="avatar-initial rounded bg-label-success"><i class="bx bx-sun"></i></span>
+          </div>
+          <h4 class="ms-1 mb-0" id="totalGeneration">0</h4>
+        </div>
+        <p class="mb-1">Today's Generation (kWh)</p>
+        <p class="mb-0">
+          <span class="fw-medium me-1" id="generationComparison">+0%</span>
+          <small class="text-muted">than yesterday</small>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-3 col-sm-6 mb-4">
+    <div class="card card-border-shadow-primary h-100">
+      <div class="card-body">
+        <div class="d-flex align-items-center mb-2 pb-1">
+          <div class="avatar me-2">
+            <span class="avatar-initial rounded bg-label-primary"><i class="bx bx-money"></i></span>
+          </div>
+          <h4 class="ms-1 mb-0" id="totalSavings">฿0</h4>
+        </div>
+        <p class="mb-1">Energy Cost Savings</p>
+        <p class="mb-0">
+          <span class="fw-medium me-1">+8.7%</span>
+          <small class="text-muted">this month</small>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-3 col-sm-6 mb-4">
+    <div class="card card-border-shadow-success h-100">
+      <div class="card-body">
+        <div class="d-flex align-items-center mb-2 pb-1">
+          <div class="avatar me-2">
+            <span class="avatar-initial rounded bg-label-success"><i class="bx bx-leaf"></i></span>
+          </div>
+          <h4 class="ms-1 mb-0" id="renewableUsage">85%</h4>
+        </div>
+        <p class="mb-1">Renewable Energy Usage</p>
+        <p class="mb-0">
+          <span class="fw-medium me-1" id="renewableChange">+5%</span>
+          <small class="text-muted">than yesterday</small>
+        </p>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="col-lg-3 col-sm-6 mb-4">
+    <div class="card card-border-shadow-info h-100">
+      <div class="card-body">
+        <div class="d-flex align-items-center mb-2 pb-1">
+          <div class="avatar me-2">
+            <span class="avatar-initial rounded bg-label-info"><i class="bx bx-leaf"></i></span>
+          </div>
+          <h4 class="ms-1 mb-0" id="co2Reduction">0</h4>
+        </div>
+        <p class="mb-1">CO₂ Reduction (kg)</p>
+        <p class="mb-0">
+          <span class="fw-medium me-1">+15.5%</span>
+          <small class="text-muted">this month</small>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Main Content Area -->
+<div class="row">
+  <!-- Power Generation Overview -->
+  <div class="col-xxl-6 mb-4">
+    <div class="card h-100">
+      <div class="card-header">
+        <div class="card-title mb-0">
+          <h5 class="m-0">Power Generation Overview</h5>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="d-none d-lg-flex generation-progress-labels mb-3">
+          <div class="generation-progress-label peak-text" style="width: 45.7%;">Peak Production</div>
+          <div class="generation-progress-label normal-text" style="width: 28.3%;">Normal Production</div>
+          <div class="generation-progress-label low-text" style="width: 17.4%;">Low Production</div>
+          <div class="generation-progress-label offline-text" style="width: 8.6%;">Offline</div>
+        </div>
+        <!-- Progress Bars for Generation States -->
+        <div class="generation-overview-progress progress mb-3" style="height: 46px;">
+          <div class="progress-bar bg-success" style="width: 45.7%">45.7%</div>
+          <div class="progress-bar bg-primary" style="width: 28.3%">28.3%</div>
+          <div class="progress-bar bg-warning" style="width: 17.4%">17.4%</div>
+          <div class="progress-bar bg-danger" style="width: 8.6%">8.6%</div>
+        </div>
+        <!-- Details Table -->
+        <div class="table-responsive">
+          <table class="table">
+            <tbody>
+              <tr>
+                <td>Peak Production</td>
+                <td>45.7%</td>
+                <td>5 sites</td>
+              </tr>
+              <tr>
+                <td>Normal Production</td>
+                <td>28.3%</td>
+                <td>3 sites</td>
+              </tr>
+              <tr>
+                <td>Low Production</td>
+                <td>17.4%</td>
+                <td>2 sites</td>
+              </tr>
+              <tr>
+                <td>Offline</td>
+                <td>8.6%</td>
+                <td>1 site</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Power Generation Chart -->
+  <div class="col-xxl-6 mb-4">
+    <div class="card h-100">
+      <div class="card-header d-flex align-items-center justify-content-between">
+        <div class="card-title mb-0">
+          <h5 class="m-0">Generation Trend</h5>
+          <small class="text-muted">Today's power generation</small>
+        </div>
+        <div class="dropdown">
+          <button class="btn btn-label-primary dropdown-toggle" data-bs-toggle="dropdown">Today</button>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="javascript:void(0);">Today</a></li>
+            <li><a class="dropdown-item" href="javascript:void(0);">Yesterday</a></li>
+            <li><a class="dropdown-item" href="javascript:void(0);">Last Week</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="card-body">
+        <div id="generationTrendChart" style="height: 350px;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Map and Details -->
+<div class="row">
+  <!-- Solar Sites Map -->
+  <div class="col-xxl-8 mb-4">
+    <div class="card">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <div class="card-title mb-0">
+          <h5 class="m-0">Solar Sites Distribution</h5>
+          <small class="text-muted">Live monitoring of all sites</small>
+        </div>
+        <div class="btn-group">
+          <button type="button" class="btn btn-primary btn-sm active">All Sites</button>
+          <button type="button" class="btn btn-outline-primary btn-sm">Low Production</button>
+          <button type="button" class="btn btn-outline-primary btn-sm">Offline</button>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="leaflet-map" id="solarSitesMap" style="height: 500px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Site Status Details -->
+  <div class="col-xxl-4 mb-4">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title mb-0">
+          <h5 class="m-0">Site Performance</h5>
+          <small class="text-muted">Real-time status</small>
+        </div>
+      </div>
+      <div id="sitePerformanceContainer"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Alert History -->
+<div class="row">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-header">
+        <h5 class="card-title mb-0">System Alerts</h5>
+      </div>
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th>Time</th>
+                <th>Site</th>
+                <th>Alert Type</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>2024-01-08 13:15</td>
+                <td>เขตบางกะปิ</td>
+                <td>Low Production</td>
+                <td><span class="badge bg-warning">Active</span></td>
+                <td>
+                  <button class="btn btn-sm btn-primary">View Details</button>
+                </td>
+              </tr>
+              <tr>
+                <td>2024-01-08 12:15</td>
+                <td>เขตปทุมวัน</td>
+                <td>Low Production</td>
+                <td><span class="badge bg-warning">Active</span></td>
+                <td>
+                  <button class="btn btn-sm btn-primary">View Details</button>
+                </td>
+              </tr>
+              <!-- More alert entries... -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+@section PageScripts {
+  <script>
+    // Initialize map
+    const map = L.map('solarSitesMap').setView([13.7563, 100.5018], 12);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    // Define markers with different colors based on status
+    const normalIcon = L.divIcon({
+      className: 'custom-div-icon',
+      html: "<div style='background-color:#4CAF50;' class='marker-pin'></div><i class='bx bx-sun bx-spin'></i>",
+      iconSize: [30, 42],
+      iconAnchor: [15, 42]
+    });
+
+    const warningIcon = L.divIcon({
+      className: 'custom-div-icon',
+      html: "<div style='background-color:#ffc825;' class='marker-pin'></div><i class='bx bx-sun'></i>",
+      iconSize: [30, 42],
+      iconAnchor: [15, 42]
+    });
+
+    const criticalIcon = L.divIcon({
+      className: 'custom-div-icon',
+      html: "<div style='background-color:#c7c6c6;' class='marker-pin'></div><i class='bx bx-sun'></i>",
+      iconSize: [30, 42],
+      iconAnchor: [15, 42]
+    });
+
+    // Solar sites data
+    const solarSites = [
+      {
+        lat: 13.7563,
+        lng: 100.5018,
+        status: 'normal',
+        name: 'Central Bangkok',
+        details: {
+          currentOutput: '125 kW',
+          dailyGeneration: '850 kWh',
+          efficiency: '92%'
+        }
+      },
+      {
+        lat: 13.7658,
+        lng: 100.5383,
+        status: 'warning',
+        name: 'เขตดุสิต',
+        details: {
+          currentOutput: '110 kW',
+          dailyGeneration: '780 kWh',
+          efficiency: '89%'
+        }
+      },
+      {
+        lat: 13.7222,
+        lng: 100.5171,
+        status: 'warning',
+        name: 'เขตบางรัก',
+        details: {
+          currentOutput: '85 kW',
+          dailyGeneration: '650 kWh',
+          efficiency: '75%'
+        }
+      },
+      {
+        lat: 13.7367,
+        lng: 100.5232,
+        status: 'critical',
+        name: 'เขตปทุมวัน',
+        details: {
+          currentOutput: '60 kW',
+          dailyGeneration: '400 kWh',
+          efficiency: '65%'
+        }
+      },
+      {
+        lat: 13.7894,
+        lng: 100.5684,
+        status: 'critical',
+        name: 'เขตบางกะปิ',
+        details: {
+          currentOutput: '50 kW',
+          dailyGeneration: '300 kWh',
+          efficiency: '58%'
+        }
+      },
+      {
+        lat: 13.9122,
+        lng: 100.5263,
+        status: 'warning',
+        name: 'เขตดอนเมือง',
+        details: {
+          currentOutput: '90 kW',
+          dailyGeneration: '700 kWh',
+          efficiency: '80%'
+        }
+      },
+      {
+        lat: 13.8506,
+        lng: 100.6421,
+        status: 'normal',
+        name: 'เขตลาดกระบัง',
+        details: {
+          currentOutput: '130 kW',
+          dailyGeneration: '950 kWh',
+          efficiency: '95%'
+        }
+      },
+      {
+        lat: 13.7323,
+        lng: 100.4502,
+        status: 'warning',
+        name: 'เขตบางพลัด',
+        details: {
+          currentOutput: '78 kW',
+          dailyGeneration: '550 kWh',
+          efficiency: '72%'
+        }
+      }
+      // Add more sites...
+    ];
+
+    // Add markers
+    solarSites.forEach(site => {
+      const icon = site.status === 'normal' ? normalIcon :
+        site.status === 'warning' ? warningIcon :
+          criticalIcon;
+
+      L.marker([site.lat, site.lng], { icon: icon })
+        .bindPopup(`
+                                                                  <div class="p-2">
+                                                                    <h6>${site.name}</h6>
+                                                                    <div class="mb-2">
+                                                                      <small>Current Output: ${site.details.currentOutput}</small><br>
+                                                                      <small>Daily Generation: ${site.details.dailyGeneration}</small><br>
+                                                                      <small>System Efficiency: ${site.details.efficiency}</small>
+                                                                    </div>
+                                                                    <button class="btn btn-primary btn-sm">View Details</button>
+                                                                  </div>
+                                                                `)
+        .addTo(map);
+    });
+
+    // Generation trend chart
+    const options = {
+      chart: {
+        type: 'area',
+        height: 350,
+        toolbar: {
+          show: false
+        }
+      },
+      series: [{
+        name: 'Power Generation',
+        data: [50, 125, 225, 300, 200, 100]
+      }],
+      yaxis: {
+        title: {
+          text: 'Power Generation (kWh)'
+        }
+      },
+      xaxis: {
+        categories: ['8:00', '10:00', '12:00', '14:00', '16:00', '18:00'],
+        title: {
+          text: 'Time of Day'
+        }
+      }
+    };
+    const chart = new ApexCharts(document.querySelector("#generationTrendChart"), options);
+    chart.render();
+
+    // Add custom CSS
+    const style = document.createElement('style');
+    style.textContent = `
+                                                                                                  .marker-pin {
+                                                                                                    width: 30px;
+                                                                                                    height: 30px;
+                                                                                                    border-radius: 50% 50% 50% 0;
+                                                                                                    position: absolute;
+                                                                                                    transform: rotate(-45deg);
+                                                                                                    left: 50%;
+                                                                                                    top: 50%;
+                                                                                                    margin: -15px 0 0 -15px;
+                                                                                                  }
+
+                                                                                                  .custom-div-icon i {
+                                                                                                    position: absolute;
+                                                                                                    width: 22px;
+                                                                                                    font-size: 22px;
+                                                                                                    left: 0;
+                                                                                                    right: 0;
+                                                                                                    margin: 10px auto;
+                                                                                                    text-align: center;
+                                                                                                    color: white;
+                                                                                                  }
+                                                                                                `;
+    document.head.appendChild(style);
+
+    // Sort solarSites by efficiency (descending order)
+    const sortedSites = solarSites.sort((a, b) =>
+      parseFloat(b.details.efficiency) - parseFloat(a.details.efficiency)
+    );
+
+    // Generate HTML for Site Performance
+    const sitePerformanceHtml = `
+                          <div class="card-body">
+                            <ul class="p-0 m-0">
+                              ${sortedSites.map(site => `
+                                <li class="d-flex mb-4 pb-1">
+                                  <div class="avatar flex-shrink-0 me-3">
+                                    <span class="avatar-initial rounded bg-label-${site.status === 'normal' ? 'success' : site.status === 'warning' ? 'warning' : 'danger'}">
+                                      <i class="bx bx-sun"></i>
+                                    </span>
+                                  </div>
+                                  <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
+                                    <div class="me-2">
+                                      <h6 class="mb-0">${site.name}</h6>
+                                      <small class="text-muted">${site.details.dailyGeneration}</small>
+                                    </div>
+                                    <div class="user-progress">
+                                      <small class="fw-semibold">${site.details.efficiency} Efficient</small>
+                                    </div>
+                                  </div>
+                                </li>
+                              `).join('')}
+                            </ul>
+                          </div>
+                        `;
+
+    // Add the generated HTML to the page
+    document.getElementById('sitePerformanceContainer').innerHTML = sitePerformanceHtml;
+
+    // Calculate total generation
+    const totalGeneration = solarSites.reduce((sum, site) => sum + parseFloat(site.details.dailyGeneration), 0);
+    document.getElementById('totalGeneration').innerText = `${totalGeneration} kWh`;
+
+    // Calculate comparison with yesterday
+    const yesterdayGeneration = 2200; // ตัวอย่างค่า
+    const generationComparison = ((totalGeneration - yesterdayGeneration) / yesterdayGeneration * 100).toFixed(1);
+    document.getElementById('generationComparison').innerText = `${generationComparison}%`;
+
+    // Calculate energy cost savings
+    const costPerKWh = 4; // ตัวอย่างค่า
+    const totalSavings = (totalGeneration * costPerKWh).toLocaleString('en-US', { style: 'currency', currency: 'THB' });
+    document.getElementById('totalSavings').innerText = totalSavings;
+
+    // CO2 Reduction
+    const emissionFactor = 0.5; // kg CO2/kWh
+    const co2Reduction = (totalGeneration * emissionFactor).toFixed(1);
+    document.getElementById('co2Reduction').innerText = `${co2Reduction} kg`;
+
+  </script>
+}
